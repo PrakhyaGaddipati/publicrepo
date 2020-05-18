@@ -1,0 +1,14 @@
+import json
+import os
+import boto3
+client = boto3.client('kms')
+def lambda_handler(event, context):
+    listofkeys = client.list_keys()
+    for key in listofkeys["Keys"]:
+        keyinfo=client.describe_key(
+            KeyId=key["KeyId"]
+        )    
+        if keyinfo["KeyMetadata"]["KeyManager"]=="CUSTOMER":
+            response = client.enable_key_rotation(
+                KeyId=keyinfo["KeyMetadata"]["KeyId"]
+            )
